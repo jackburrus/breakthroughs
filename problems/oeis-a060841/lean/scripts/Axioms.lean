@@ -1,4 +1,4 @@
-import A060841
+import A060841.Main
 
 /-!
 Prints the axioms behind the final theorem. Expected once L1–L3 are proved:

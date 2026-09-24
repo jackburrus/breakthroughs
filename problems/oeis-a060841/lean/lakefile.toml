@@ -12,5 +12,8 @@ name = "formal_conjectures"
 git = "https://github.com/google-deepmind/formal-conjectures"
 rev = "40a8592cb6f7e96cb9a8275d96bb3e013feeb1dc"
 
+# No root file: `Main` alone imports upstream (and so all of Mathlib). Provers build
+# just their lemma module, e.g. `lake build A060841.L3Large`, which takes seconds.
 [[lean_lib]]
 name = "A060841"
+globs = ["A060841.+"]

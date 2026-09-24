@@ -7,7 +7,7 @@ This file is the project's committed home for project-intrinsic agent knowledge:
 - Run its tests with `python3 -m unittest` inside that directory. They fail if `REPORT.md` or `valuations_n_le_81.csv` is stale; regenerate both with `python3 report.py --write`.
 - Outward steps (GitHub forks or PRs, OEIS comments, publishing write-ups) belong to the project owner, not agents.
 - `problems/oeis-a060841/lean/` is a Lake project pinned to google-deepmind/formal-conjectures by commit; its `CLAUDE.md` holds the prover rules (no `native_decide`, no new axioms, never edit upstream statements) and `scripts/check.sh` is the build-and-axiom gate.
-- Lean builds import all of Mathlib via FormalConjecturesUtil, so even a trivial file takes minutes to elaborate on this machine; fetch the Mathlib cache (`lake exe cache get`), never compile Mathlib.
+- Only `A060841/Main.lean` imports upstream (all of Mathlib, minutes per load); lemma files import specific Mathlib modules. New worktrees run `scripts/shared-lake.sh` to share one prebuilt dependency tree; never compile Mathlib.
 
 ## Maintaining this file
 
