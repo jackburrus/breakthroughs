@@ -22,7 +22,7 @@ so it is the upstream statement by construction. The upstream theorem itself is 
 
 | File | Lemma | Statement |
 | --- | --- | --- |
-| `A046969/L1Den.lean` | `L1_den_bernoulli` | `(bernoulli (2 * p)).den = 6` (p, q prime, `3 < p`) |
+| `A046969/L1Den.lean` | `L1_den_bernoulli` (proved) | `(bernoulli (2 * p)).den = 6` (p, q prime, `3 < p`) |
 | `A046969/FFaulhaber.lean` | `F_faulhaber` | `∃ r, ¬ ℓ ∣ r.den ∧ S_m(ℓ) = ℓ·B_m + ℓ²·r` (ℓ prime, m even, `4 ≤ m`, `¬ ℓ ∣ m + 1`) |
 | `A046969/L2PowSum.lean` | `L2_sq_dvd_powSum` | `p ^ 2 ∣ powSum (2 * p) p` (p prime, `3 < p`) |
 | `A046969/L3PowSum.lean` | `L3_powSum_div` | `q ∣ powSum (q + 1) q ∧ 12 * (powSum (q + 1) q / q) ≡ 1 [MOD q]` (q prime, `5 ≤ q`) |
