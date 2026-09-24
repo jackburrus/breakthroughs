@@ -1,0 +1,16 @@
+name = "a060841"
+defaultTargets = ["A060841"]
+
+[leanOptions]
+autoImplicit = false
+relaxedAutoImplicit = false
+
+# Upstream statement, read-only. Bump `rev` only on purpose: the Lean toolchain
+# and Mathlib must match what that commit pins (copy its lean-toolchain too).
+[[require]]
+name = "formal_conjectures"
+git = "https://github.com/google-deepmind/formal-conjectures"
+rev = "40a8592cb6f7e96cb9a8275d96bb3e013feeb1dc"
+
+[[lean_lib]]
+name = "A060841"
