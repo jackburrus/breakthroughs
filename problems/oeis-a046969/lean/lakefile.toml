@@ -1,0 +1,19 @@
+name = "a046969"
+defaultTargets = ["A046969"]
+
+[leanOptions]
+autoImplicit = false
+relaxedAutoImplicit = false
+
+# Upstream statement, read-only. Bump `rev` only on purpose: the Lean toolchain
+# and Mathlib must match what that commit pins (copy its lean-toolchain too).
+[[require]]
+name = "formal_conjectures"
+git = "https://github.com/google-deepmind/formal-conjectures"
+rev = "40a8592cb6f7e96cb9a8275d96bb3e013feeb1dc"
+
+# No root file: `Main` alone imports upstream (and so all of Mathlib). Provers build
+# just their lemma module, e.g. `lake build A046969.L2PowSum`, which takes seconds.
+[[lean_lib]]
+name = "A046969"
+globs = ["A046969.+"]

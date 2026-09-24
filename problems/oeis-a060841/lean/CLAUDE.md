@@ -70,6 +70,7 @@ scripts/shared-lake.sh        # link .lake/packages to the shared prebuilt tree 
 scripts/shared-lake.sh status
 ```
 
+Both scripts are thin wrappers around `tools/lean/` at the repository root, shared with every problem.
 The first run on a machine fetches the Mathlib cache, builds the upstream support library privately
 (about 15 min) and publishes the result to `~/.cache/breakthroughs-lake/<pin>`. Later worktrees link to it in seconds.
 The shared tree is read-only and safe for any number of worktrees at once. If it is missing or stale, the script

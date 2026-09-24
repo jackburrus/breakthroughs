@@ -6,8 +6,9 @@ This file is the project's committed home for project-intrinsic agent knowledge:
 - A060841 numerics: `problems/oeis-a060841/numerics/` is standard-library Python with exact int/Fraction arithmetic only. Check any intermediate claim there before trying to prove it.
 - Run its tests with `python3 -m unittest` inside that directory. They fail if `REPORT.md` or `valuations_n_le_81.csv` is stale; regenerate both with `python3 report.py --write`.
 - Outward steps (GitHub forks or PRs, OEIS comments, publishing write-ups) belong to the project owner, not agents.
-- `problems/oeis-a060841/lean/` is a Lake project pinned to google-deepmind/formal-conjectures by commit; its `CLAUDE.md` holds the prover rules (no `native_decide`, no new axioms, never edit upstream statements) and `scripts/check.sh` is the build-and-axiom gate.
-- Only `A060841/Main.lean` imports upstream (all of Mathlib, minutes per load); lemma files import specific Mathlib modules. New worktrees run `scripts/shared-lake.sh` to share one prebuilt dependency tree; never compile Mathlib.
+- Each `problems/<id>/lean/` is a Lake project pinned to google-deepmind/formal-conjectures by commit; its `CLAUDE.md` holds the prover rules (no `native_decide`, no new axioms, never edit upstream statements) and `scripts/check.sh` is the build-and-axiom gate.
+- Only `<ID>/Main.lean` imports upstream (all of Mathlib, minutes per load); lemma files import specific Mathlib modules. New worktrees run `scripts/shared-lake.sh` to share one prebuilt dependency tree per pin across problems; never compile Mathlib.
+- Both per-project scripts wrap `tools/lean/`; a new problem copies the wrappers and keeps the same pin when upstream allows, so it reuses the tree.
 
 ## Maintaining this file
 
