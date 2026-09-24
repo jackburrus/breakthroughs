@@ -24,19 +24,20 @@ Write `v` for `padicValNat p`. Each hypothesis `p ≥ 5` below also includes `p.
 
 | File | Lemmas | Statement | Uses |
 | --- | --- | --- | --- |
-| `UUnitSums.lean` | `U_sum_inv`, `U_sum_inv_sq` | `∑ a⁻¹ = 0` and `∑ (a⁻¹)^2 = 0` in `ZMod (p^s)`, over `a < N`, `p ∤ a` (`p ≥ 5`, `p^s ∣ N`) | |
-| `DShiftProd.lean` | `D_shiftProd` | `p^(3 + 3 min(v B, v L)) ∣ ∏ (B p + a) - ∏ a`, over `a < L p`, `p ∤ a` (`p ≥ 5`) | U |
-| `KJacobsthal.lean` | `K_jacobsthal` | `p^(v C(A,B) + 3 + 3 min(v B, v(A-B))) ∣ C(A p, B p) - C(A, B)` (`p ≥ 5`, `B ≤ A`) | D |
-| `KNegJacobsthal.lean` | `KNeg_jacobsthal` | `p^(v C(m+i-1,i) + 3 + 3 min(v i, v m)) ∣ C(m p + i p - 1, i p) - C(m+i-1, i)` (`p ≥ 5`, `1 ≤ m`) | K |
-| `AAbsorption.lean` | `A_pos`, `A_neg`, `A_kummer`, `A_symm_neg` | valuation bounds from absorption, and `C(N+k-1,k) C(k,j) = C(N+j-1,j) C(N+k-1,k-j)` | |
-| `VVanish.lean` | `V_pos`, `V_neg` | `p^(v N) ∣ C(N,k) C(k,j)` and `∣ C(N+k-1,k) C(k,j)` unless `p ∣ k ∧ p ∣ j` | A |
-| `PPerTerm.lean` | `P_cube`, `P_pos`, `P_neg` | `p^(3 (v m + 1)) ∣` the difference of the cubed summands at `(i p, l p)` and `(i, l)` | K, K⁻, A |
-| `SSplit.lean` | `S_split` | a double sum over `j ≤ k ≤ m p` reduces mod `q` to one over `l ≤ i ≤ m` | |
-| `ROneStep.lean` | `R_pos`, `R_neg`, `R_oneStep`, `R_dvd` | `p^(3 (v m + 1)) ∣ aInt(±m p) - aInt(±m)`, then `p^(3k) ∣ aInt(n p^(k-1)) - aInt(n p^k)` | S, V, P |
+| `UUnitSums.lean` | `U_sum_inv`, `U_sum_inv_sq` (open) | `∑ a⁻¹ = 0` and `∑ (a⁻¹)^2 = 0` in `ZMod (p^s)`, over `a < N`, `p ∤ a` (`p ≥ 5`, `p^s ∣ N`) | |
+| `DShiftProd.lean` | `D_shiftProd` (open) | `p^(3 + 3 min(v B, v L)) ∣ ∏ (B p + a) - ∏ a`, over `a < L p`, `p ∤ a` (`p ≥ 5`) | U |
+| `KJacobsthal.lean` | `K_jacobsthal` (open) | `p^(v C(A,B) + 3 + 3 min(v B, v(A-B))) ∣ C(A p, B p) - C(A, B)` (`p ≥ 5`, `B ≤ A`) | D |
+| `KNegJacobsthal.lean` | `KNeg_jacobsthal` (proved) | `p^(v C(m+i-1,i) + 3 + 3 min(v i, v m)) ∣ C(m p + i p - 1, i p) - C(m+i-1, i)` (`p ≥ 5`, `1 ≤ m`) | K |
+| `AAbsorption.lean` | `A_pos`, `A_neg`, `A_kummer`, `A_symm_neg` (proved) | valuation bounds from absorption, and `C(N+k-1,k) C(k,j) = C(N+j-1,j) C(N+k-1,k-j)` | |
+| `VVanish.lean` | `V_pos`, `V_neg` (proved) | `p^(v N) ∣ C(N,k) C(k,j)` and `∣ C(N+k-1,k) C(k,j)` unless `p ∣ k ∧ p ∣ j` | A |
+| `PPerTerm.lean` | `P_cube`, `P_pos`, `P_neg` (proved) | `p^(3 (v m + 1)) ∣` the difference of the cubed summands at `(i p, l p)` and `(i, l)` | K, K⁻, A |
+| `SSplit.lean` | `S_split` (proved) | a double sum over `j ≤ k ≤ m p` reduces mod `q` to one over `l ≤ i ≤ m` | |
+| `ROneStep.lean` | `R_pos`, `R_neg`, `R_oneStep`, `R_dvd` (proved) | `p^(3 (v m + 1)) ∣ aInt(±m p) - aInt(±m)`, then `p^(3k) ∣ aInt(n p^(k-1)) - aInt(n p^k)` | S, V, P |
 
-- Every file states its dependencies with `sorry`, so all files can be proved in parallel.
-  The long ones are U, D and K (about 630 lines of Epoch's 978).
-  U, D and K form one chain, but each can start now against the stated lemma it uses.
+- "Proved" means the file itself has no `sorry`. Everything from K⁻ up to `Main.lean` is proved,
+  so `conjecture2` now waits only on U, D and K (about 630 lines of Epoch's 978).
+- U, D and K can go to three provers in parallel now. Each works against the statement of the lemma it uses
+  (D against U's, K against D's), which stays `sorry` until that lemma's prover finishes.
 - `Defs.lean` holds `aInt`, a copy of upstream's `aInt`, and `Main.lean` proves them equal by `rfl`. Do not change it.
 - `Main.lean` already assembles `R_dvd` into the upstream theorem and builds. Do not put proof work there.
 - Edit only the file for your lemma. Helper lemmas go in that file (inside a `namespace A141057.<Letter>`,
