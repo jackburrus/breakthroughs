@@ -9,7 +9,7 @@ PRD step 3 bookkeeping, sign-free. The double sum `∑_{k ≤ m p} ∑_{j ≤ k}
 `q` with `∑_{i ≤ m} ∑_{l ≤ i} g i l` when every summand with `(k, j)` not both multiples of `p`
 is `≡ 0`, and `f (i p) (l p) ≡ g i l` for `l ≤ i ≤ m`: the pairs of multiples of `p` in the
 triangle `j ≤ k ≤ m p` are exactly `(i p, l p)` with `l ≤ i ≤ m`.
-Both signs use it: `R_pos` with `f k j = (C(m p, k) C(k, j))³`, `R_neg` with the signed
+Both signs use it: `R_step` with `f k j = (C(m p, k) C(k, j))³`, `R_stepNeg` with the signed
 negative-index summands.
 -/
 

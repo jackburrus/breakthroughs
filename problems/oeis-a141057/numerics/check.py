@@ -3,9 +3,9 @@ aInt(n p^k) = aInt(n p^(k-1)) (mod p^(3k)) for all integers n != 0, primes p >= 
 aInt(n) = a(n) for n >= 0 and aInt(-m) = sum_{k=0}^{m} C(-m,k)^3 F(k), C(-m,k) = (-1)^k C(m+k-1,k),
 F(k) = sum_j C(k,j)^3 (Franel numbers). Standard library, exact integers.
 
-Also tests the proof split used by Epoch's accepted proof of conjecture 1 (positive n), now for
-negative n: with N = m p, write aInt(-N) = M + R where M sums the pairs (k, j) = (i p, l p) and R the
-rest. The PRD's plan needs, modulo p^(3(v_p(m)+1)):  M = aInt(-m)  and  R = 0,  term by term.
+Also tests, for negative n, the term-by-term split our proof uses: with N = m p and e = v_p(m), split
+aInt(-N) at the pairs (k, j) = (i p, l p) (S). Modulo p^(3e+3), every other pair vanishes (V) and each
+multiple pair matches the (i, l) term of aInt(-m) (P).
 Usage: python3 check.py [LIMIT]   (checks |n| p^k <= LIMIT, default 700)
 """
 from math import comb

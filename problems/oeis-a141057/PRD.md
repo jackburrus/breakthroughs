@@ -41,14 +41,14 @@ theorem conjecture2 (p k : ℕ) (n : ℤ) (hp : p.Prime) (h_p_ge_5 : 5 ≤ p) (h
 FC's `aInt` matches Bala's definition: the first values −1, 255, −53893 agree with his OEIS comment.
 The statement covers both signs of n, so the proof must also redo the positive case: FC's `conjecture1` is a `sorry` with a link, which Comparator would reject.
 
-Proof sketch, the Epoch/Jacobsthal argument transposed.
-Take m ≥ 1 and N = mp.
+Proof sketch, the Jacobsthal–Kazandzidis argument for both signs.
+Take m ≥ 1 with p^e ∣ m, and N = mp.
 Write aInt(−N) = Σ_{j ≤ k ≤ N} T(k, j) with T(k, j) = (C(−N,k)·C(k,j))³.
-It suffices to prove the one-step claim p^(3(v_p(m)+1)) ∣ aInt(−mp) − aInt(−m), then set m = n p^(k−1).
+It suffices to prove the one-step claim p^(3e+3) ∣ aInt(−mp) − aInt(−m), then set m = n p^(k−1) with e = k − 1.
 
-1. **Pairs not both divisible by p vanish.** Absorption gives k·C(N+k−1,k) = N·C(N+k−1,k−1), so v_p(C(−N,k)) ≥ v_p(N) − v_p(k) = v_p(m) + 1 when p ∤ k. The multinomial symmetry C(N+k−1,k)·C(k,j) = C(N+j−1,j)·C(N+k−1,k−j) handles p ∤ j. Cubing gives p^(3(v_p(m)+1)) ∣ T(k, j).
-2. **Multiple pairs match the smaller sum.** For (k, j) = (ip, lp), use C(−mp, ip) = (−1)^i · (m/(m+i)) · C((m+i)p, ip) and the same identity at p = 1. The strengthened Jacobsthal congruence C(Ap,Bp) ≡ C(A,B) (mod p^(v_p(C(A,B)) + 3 + 3·min(v_p B, v_p(A−B)))) then gives T(ip, lp) ≡ (C(−m,i)·C(i,l))³ (mod p^(3(v_p(m)+1))). This is Epoch's lemma `kazan`, and the cube step is its `perterm`.
-3. Summing gives the one-step claim. The positive case is the same argument with Epoch's decomposition.
+1. **Pairs not both divisible by p vanish.** Absorption gives k·C(N+k−1,k) = N·C(N+k−1,k−1), so p^(e+1) ∣ C(−N,k) when p ∤ k. The multinomial symmetry C(N+k−1,k)·C(k,j) = C(N+j−1,j)·C(N+k−1,k−j) handles p ∤ j. Cubing gives p^(3e+3) ∣ T(k, j).
+2. **Multiple pairs match the smaller sum.** For (k, j) = (ip, lp), use C(−mp, ip) = (−1)^i · (m/(m+i)) · C((m+i)p, ip) and the same identity at p = 1. The Jacobsthal–Kazandzidis congruence, in the form: if p^u divides a and b and p^w divides C(a+b, a), then C((a+b)p, ap) ≡ C(a+b, a) (mod p^(w + 3u + 3)), then gives T(ip, lp) ≡ (C(−m,i)·C(i,l))³ (mod p^(3e+3)), with the cube adding twice the valuation.
+3. Summing gives the one-step claim. The positive case is the same argument on upstream's triangle Σ_k Σ_{j ≤ k}, and one splitting lemma (`S_split`) separates the multiple pairs for both signs.
 
 ## Evidence
 
@@ -73,23 +73,25 @@ Non-goals:
 
 ```mermaid
 flowchart TD
-  U["U: unit sums Σx⁻¹, Σx⁻² ≡ 0<br/>over (ℤ/p^s)ˣ, p ≥ 5"] --> K["K: Jacobsthal–Kazandzidis<br/>C(Ap,Bp) ≡ C(A,B)"]
-  K --> P["P: per-term congruence<br/>(both signs)"]
+  U["U: unit squares Σu² ≡ 0<br/>over (ℤ/p^s)ˣ, p ≥ 5"] --> D["D: shifted products<br/>F(x) ≡ F(0)"]
+  D --> K["K, K⁻: Jacobsthal–Kazandzidis<br/>mod p^(w + 3u + 3)"]
+  K --> P["P: per-summand congruence<br/>(both signs)"]
   A["A: absorption and symmetry<br/>valuation bounds"] --> V["V: non-multiple terms vanish"]
-  P --> R["R: one-step p^(3(v+1)) ∣ a(±mp) − a(±m)"]
+  A --> P
+  S["S: split the triangle<br/>at multiples of p"] --> R
+  P --> R["R: one-step p^(3e+3) ∣ a(±mp) − a(±m)"]
   V --> R
   R --> M[conjecture2]
 ```
 
-The lemma list mirrors Epoch's accepted positive-case file (`Spec.lean`, 978 lines: `US_inv`, `dvd_e2`, `dvd_T1`, `kazan`, `perterm`, `Claim1`, `red`).
-That repo has no license file, so use it as a map and write our own code, or ask Epoch for permission (an owner decision).
-The new work is the negative-index versions of A, P and V, plus a sign case split in the main theorem.
+The lemma structure and proofs are our own; `NOTES.md` ("Proof structure") gives the argument step by step, and `lean/CLAUDE.md` maps each step to its file and lemma names.
+Each lemma has a positive-index form and a negative-index twin, and `R_stepInt` does the sign case split for the main theorem.
 
 ## Milestones
 
 | Week | Milestone | Done when |
 | --- | --- | --- |
-| 0 | Re-verify status; decide on reusing Epoch's code | Owner decision recorded |
+| 0 | Re-verify status; settle code provenance | Done: status re-verified, and the proof was written clean-room, with no code from other proofs |
 | 1 | U, K and A | Compile with no sorry |
 | 2 | P and V for both signs; R | Compile with no sorry |
 | 2–3 | Main theorem, axioms, Comparator | Comparator passes |
@@ -98,16 +100,16 @@ The new work is the negative-index versions of A, P and V, plus a sign case spli
 
 | Risk | Likelihood | Mitigation |
 | --- | --- | --- |
-| Rebuilding the ~1000-line positive-case machinery without copying unlicensed code | Medium | Ask Epoch for a license, or re-derive from the natural-language proof in their `metadata.json` |
-| Negative-index bookkeeping (`Int.toNat`, signs, the `n ≠ 0` split) | Medium | Prove `red` for ℕ inputs m in both forms, then transport to ℤ once |
+| Rebuilding the positive-case machinery without copying unlicensed code | Resolved | The lemmas were rewritten clean-room with our own statements and proofs, so no license is needed |
+| Negative-index bookkeeping (`Int.toNat`, signs, the `n ≠ 0` split) | Medium | Prove the one step for ℕ inputs m in both forms (`R_step`, `R_stepNeg`), then transport to ℤ once (`R_stepInt`) |
 | Scooped by Epoch or others | Medium | The positive proof is public, so the negative case is an obvious next target; start soon |
 | Bala's comment stays conjectural in other normalizations | Low | FC's statement is the target; the numerics confirm FC's `aInt` |
 
-- [ ] Ask Epoch (Tom Adamczewski) about licensing LeanOpenProblems-results code? Owner's call.
+- [x] Licensing Epoch's positive-case code: moot, since the clean-room rewrite uses none of it.
 
 ## Sources
 
 - FC `FormalConjectures/OEIS/141057.lean` at `2424bb4`, PRs #5016 and #5594
 - OEIS A141057 (rev 35, Aug 20, 2026)
-- epoch-research/LeanOpenProblems-results `runs/oeis-full-50usd-ant-j0j0g4uzligm1k41/oeis_a141057_supercongruence_conjecture/` (`Spec.lean`, `metadata.json`)
-- Jacobsthal's congruence (1952), and its Kazandzidis strengthening, as used there
+- epoch-research/LeanOpenProblems-results `runs/oeis-full-50usd-ant-j0j0g4uzligm1k41/oeis_a141057_supercongruence_conjecture/` (prior work: the positive-index proof)
+- Jacobsthal's congruence (1952), and its Kazandzidis strengthening

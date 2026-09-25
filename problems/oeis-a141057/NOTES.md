@@ -1,6 +1,8 @@
-# A141057 conjecture 2: status and Epoch reuse notes
+# A141057 conjecture 2: status and proof structure
 
-Sep 24, 2026. Companion to `PRD.md`. The Lean project is `lean/`; its `CLAUDE.md` holds the prover rules and lemma table.
+The target is `OeisA141057.conjecture2` in formal-conjectures: Bala's supercongruences
+a(n p^k) ≡ a(n p^(k−1)) (mod p^(3k)) for primes p ≥ 5, for his extension of A141057 to negative n.
+The plan is `PRD.md`, the Lean proof is in `lean/`, and `numerics/lemmas.py` checks every lemma statement.
 
 ## Open status, re-verified Sep 24, 2026
 
@@ -8,44 +10,45 @@ Sep 24, 2026. Companion to `PRD.md`. The Lean project is `lean/`; its `CLAUDE.md
 | --- | --- |
 | formal-conjectures main `2424bb4` (Sep 24, 19:42 UTC) | `conjecture2` is still `research open` with no `formal_proof`. `FormalConjectures/OEIS/141057.lean` is byte-identical to our pin `40a8592`. It was last touched by `6fbb54f` (the Sep 18 "modulize" chore). Main is 6 commits ahead of the pin, and none of them touch this file or `FormalConjecturesUtil`, so the pin stays and the shared tree is reused. |
 | FC pull requests | No PR, open or closed, mentions 141057 apart from #5016 (added the statement, merged Aug 20) and #5594 (linked the positive-case proof, merged Sep 12). Searches for "supercongruence" and "Abelian cubes" also find #4946 (open, 43 AutoOeis conjectures) and #6008 (merged, marks five problems solved), and neither touches this file. GitHub code search for `OeisA141057` finds only the FC file. |
-| Epoch LeanOpenProblems-results main `fd09021` (Sep 16) | A141057 appears in four runs, all on the positive-n problem `oeis_a141057_supercongruence_conjecture`. Claude Opus 4.8 (`oeis-full-50usd-ant`) is accepted. Gemini 3.5 Flash (`oeis-full-50usd-gdm`) and GPT-5.5 (`oeis-full-50usd-oai`) are rejected. One run is new since the PRD: Gemini 3.1 Pro (`oeis-open-full-gemini31pro`, Sep 16), which was rejected because its file did not compile. `metadata/oeis/conjectures.json` states only the positive conjecture for A141057. |
-| Epoch paper, arXiv:2608.11941 v2 | Lists only the positive-n conjecture for A141057. |
+| Epoch AI's OEIS Open benchmark (LeanOpenProblems-results main `fd09021`, Sep 16; arXiv:2608.11941 v2) | States only the positive-n conjecture for A141057. All of its A141057 runs target that problem. |
 | OEIS A141057 | Still revision 35 (Aug 20, 2026), with no later edits in the history. Bala's comment on negative n is unchanged: the extension "appears to satisfy the same supercongruences". |
 
 Nobody has targeted the negative-index statement.
 
-## Reusing Epoch's positive-case proof
+## Prior work
 
-Source: `runs/oeis-full-50usd-ant-j0j0g4uzligm1k41/oeis_a141057_supercongruence_conjecture/Submission/Spec.lean` at commit `f02efd9` (the commit FC links), 978 lines, Lean v4.27.0.
-Its natural-language proof is `metadata.json` (`full_proof`) in the same run directory.
-Epoch's repository has no license, so read it as a map and write our own code (the PRD leaves permission as an open owner decision).
-We build on Lean v4.33.1, so expect some Mathlib names to have drifted.
+Epoch AI's agent proved the positive-index case (`conjecture1`) in August 2026, and formal-conjectures links that proof.
 
-| Epoch (Spec.lean line) | Our lemma | Reuse |
-| --- | --- | --- |
-| `isUnit_unit_mul` 16, `US_zero` 22, `zmod_mul_inv` 49, `US_inv` 56, `US_inv2` 70, `isUnit_two_zmod`/`isUnit_three_zmod` 253/258 | `U_sum_inv`, `U_sum_inv_sq` | The argument is sign-free and carries over unchanged. Doubling permutes the units of `ZMod m`, and `2⁻¹ - 1`, `2⁻² - 1` are units when `p ≥ 5`. |
-| `sum_block` 91, `sum_zmod_eq_sum_range` 118, `RED` 127, `sumAinv` 263, `sumAinv2` 267 | same | Reduces a sum over `range N` filtered by `p ∤ a` to `N / p^s` copies of a sum over units. `sumAinv`/`sumAinv2` are our U statements, with `a⁻¹ * a⁻¹` in place of `a⁻¹ ^ 2`. |
-| `zmod_mul_inv'` 273, `prod_zmod_inv` 279, `key2` 292, `zmod_unit_mul_inv` 323, `prod_compl_eq` 326, `dvd_e2` 338 | `D_shiftProd` (the `e₂` bound) | Unchanged. `key2` is `(∑ x)² = ∑ x² + 2 ∑_{pairs}`. |
-| `neg_zmod_inv` 376, `dvd_T1` 384 | `D_shiftProd` (the `e₁` bound) | Unchanged. It pairs `c` with `L p - c`. |
-| `prod_const_add_expand` 499, `dvd_Delta` 511 | `D_shiftProd` | Same statement. Epoch takes the products in ℤ (`(B*p:ℤ) + a`); ours are ℕ products cast to ℤ, which fits K's factorial identities. |
-| `gg` 156, `prod_Icc_id_eq_fac` 158, `fac_split` 163, `F3` 190, `gg_add` 223, `kazan` 563 | `K_jacobsthal` | Same statement. We write the exponent as `v + 3 + 3 * min` where Epoch writes `v + (3 + 3 * min)`. |
-| `padicVal_choose_ge` 646 | `A_pos` | Same statement. |
-| `kummerBin` 661 | `A_kummer` | Same statement. |
-| `perterm` 671 | `P_cube` + `P_pos` | Lines 685–796 are the sign-free algebra, which we isolated as `P_cube` (it has no binomials in it). Epoch orders the multinomial as `C(mp, ip) C((m-i)p, jp)`. We follow upstream's order `C(mp, ip) C(ip, lp)`, so K is applied at `(m, i)` and `(i, l)`, and the second side condition uses `A_pos (m, i)` + `A_kummer (l, i - l)`. |
-| `multinom_symm` 810 | Mathlib `Nat.choose_mul` | Mathlib now covers the positive symmetry. The negative one is the new `A_symm_neg`. |
-| `gt` 805, `Dom` 807, `A141057_eq` 834 | none | Epoch rewrote a(N) as a multinomial sum over pairs `(r, s)`. We do not need this: upstream's `aInt` is already the triangle `∑_k ∑_{j ≤ k}`, and `S_split` works on it directly for both signs. |
-| `Claim1` 847 | `V_pos` | Same idea. Ours is uncubed and needs no range hypothesis. |
-| `red` 886 | `R_pos` | Same shape, but the split goes through `S_split` rather than an image of `Dom m`. |
-| main theorem 955 | `R_dvd` | Same reduction `m = n p^(k-1)`, now over ℤ via `R_oneStep`. |
+## Proof structure
 
-New, with no Epoch counterpart: `KNeg_jacobsthal`, `A_neg`, `A_symm_neg`, `V_neg`, `P_neg`, `R_neg`, `R_oneStep` (the sign split), and the generic `S_split`.
-The reusable part (U, D, K, about lines 16–645 of Spec.lean) is also the hardest.
+The upstream statement covers both signs of n, so the proof treats a(N) and aInt(−N) side by side.
+Everything reduces to one step: if p^e divides n, then aInt(n p) ≡ aInt(n) (mod p^(3e+3)).
+Taking n p^j, which p^j divides, gives the conjecture with k = j + 1.
 
-## Proof route for negative indices
+Write a summand of a(N) as C(N, k) C(k, j), cubed, and a summand of aInt(−N) as (−1)^k C(N+k−1, k) C(k, j), cubed.
+The one step splits the sum over j ≤ k ≤ N p into the pairs that are both multiples of p and the rest.
 
-For `m ≥ 1`, `aInt(-m) = ∑_{k ≤ m} ∑_{j ≤ k} (-1)^k (C(m+k-1, k) C(k, j))³`.
-At `N = m p`, the non-multiple pairs vanish modulo `p^(3 (v_p m + 1))` by `V_neg`, because `k C(N+k-1, k) = N C(N+k-1, k-1)`.
-The multiple pairs `(i p, l p)` match the `(i, l)` terms of `aInt(-m)` by `P_neg`, because `(-1)^(i p) = (-1)^i`.
-`P_neg` needs `KNeg_jacobsthal`, which comes from `K_jacobsthal` at `(m + i, i)` and the identity `(m + i) C(m + i - 1, i) = m C(m + i, i)`.
-The truncation `k ≤ m p` is compatible with the split: `p ∣ k ≤ m p` if and only if `k = i p` with `i ≤ m`.
-`../numerics/lemmas.py` checks every lemma statement in the general form stated in Lean.
+1. **Absorption (A).** k C(N, k) = N C(N−1, k−1) says N divides k C(N, k). The negative twin says N divides k C(N+k−1, k).
+   Since N also divides N C, it divides gcd(N, k) C. So x + y divides gcd(x, y) C(x+y, x).
+2. **Vanishing (V).** If p ∤ k, then p^e ∣ N ∣ k C(N, k) forces p^e ∣ C(N, k). If p ∣ k but p ∤ j, move j into
+   the first binomial first. With N = n p, every pair that is not both a multiple of p contributes a multiple of p^(3e+3).
+3. **Unit squares (U).** For p ≥ 5, the squares of the units of Z/p^s sum to 0. Doubling permutes the units,
+   so the sum T satisfies T = 4T, and 3 is a unit. The integers below c p^s prime to p cover each unit c times.
+4. **Shifted products (D).** Let F(x) be the product of (x + a) over a < N prime to p. If p^r ∣ x and p^s ∣ N,
+   then F(x) ≡ F(0) mod p^(3t), with t = min(r, s). The reflection a ↦ N − a gives F(x)² as the product of
+   a(N−a) + x(x+N). Expanding to first order in y = x(x+N) leaves y times the sum of 1/(a(N−a)).
+   Modulo p^t, 1/(a(N−a)) is −1/a², and the inverse squares sum to 0 by U. Then F(x) + F(0) ≡ 2F(0) (mod p)
+   is prime to p and cancels.
+5. **Jacobsthal–Kazandzidis (K, K⁻).** C(M+n, n) n! = (M+1)⋯(M+n). At M = b p and n = a p, split off the
+   multiples of p. Comparing with the same identity at (b, a) gives C((a+b)p, ap) H(0) = C(a+b, a) H(b),
+   where H(b) is the product of (bp + j) over j < ap prime to p. D gives H(b) ≡ H(0) mod p^(3u+3) when
+   p^u divides a and b. The negative side runs the same argument on M(M+1)⋯(M+n−1).
+6. **Per-summand congruence (P).** Index a summand by j = a, k = a+b, N = a+b+c. K (or K⁻) gives each binomial
+   factor to relative precision 3u + 3, with u the valuation of a gcd. A bounds e by those gcds and the valuations
+   of the small binomials. A product keeps the relative precision, and cubing adds twice the valuation,
+   which reaches p^(3e+3).
+7. **Summation (S, R).** S splits the triangle of indices at the multiples of p. V and P give the one step for
+   n ≥ 0 and n < 0 (the sign (−1)^(ip) is (−1)^i, as p is odd). `Main.lean` applies it to n p^(k−1).
+
+`lean/CLAUDE.md` maps these steps to files and lemma names. `lean/scripts/check.sh` builds the proof and
+confirms that `A141057.conjecture2` uses only `propext`, `Classical.choice` and `Quot.sound`.

@@ -1,6 +1,6 @@
 # A141057 Lean project: rules for provers
 
-The plan is `../PRD.md`. `../NOTES.md` has the open-status check and maps Epoch's positive-case proof onto our lemmas.
+The plan is `../PRD.md`. `../NOTES.md` has the open-status check and the proof structure.
 Each lemma file's docstring sketches its proof. Check any numeric claim with `../numerics/lemmas.py` before trying to prove it.
 
 ## Target
@@ -18,33 +18,28 @@ Our proof is `A141057.conjecture2` in `A141057/Main.lean`. Its type is `type_of%
 so it is the upstream statement by construction. Upstream's `conjecture1` and `conjecture2` are both `sorry`, so never cite them.
 The statement covers both signs of `n`, so the positive case is proved again here.
 
-## Layout: one lemma file per prover
+## Layout: one lemma file per letter
 
-Write `v` for `padicValNat p`. Each hypothesis `p ≥ 5` below also includes `p.Prime`.
+Each hypothesis `p ≥ 5` below also includes `p.Prime`. Exponents come from hypotheses `p ^ e ∣ n`, not from valuations.
 
 | File | Lemmas | Statement | Uses |
 | --- | --- | --- | --- |
-| `UUnitSums.lean` | `U_sum_inv`, `U_sum_inv_sq` (open) | `∑ a⁻¹ = 0` and `∑ (a⁻¹)^2 = 0` in `ZMod (p^s)`, over `a < N`, `p ∤ a` (`p ≥ 5`, `p^s ∣ N`) | |
-| `DShiftProd.lean` | `D_shiftProd` (open) | `p^(3 + 3 min(v B, v L)) ∣ ∏ (B p + a) - ∏ a`, over `a < L p`, `p ∤ a` (`p ≥ 5`) | U |
-| `KJacobsthal.lean` | `K_jacobsthal` (open) | `p^(v C(A,B) + 3 + 3 min(v B, v(A-B))) ∣ C(A p, B p) - C(A, B)` (`p ≥ 5`, `B ≤ A`) | D |
-| `KNegJacobsthal.lean` | `KNeg_jacobsthal` (proved) | `p^(v C(m+i-1,i) + 3 + 3 min(v i, v m)) ∣ C(m p + i p - 1, i p) - C(m+i-1, i)` (`p ≥ 5`, `1 ≤ m`) | K |
-| `AAbsorption.lean` | `A_pos`, `A_neg`, `A_kummer`, `A_symm_neg` (proved) | valuation bounds from absorption, and `C(N+k-1,k) C(k,j) = C(N+j-1,j) C(N+k-1,k-j)` | |
-| `VVanish.lean` | `V_pos`, `V_neg` (proved) | `p^(v N) ∣ C(N,k) C(k,j)` and `∣ C(N+k-1,k) C(k,j)` unless `p ∣ k ∧ p ∣ j` | A |
-| `PPerTerm.lean` | `P_cube`, `P_pos`, `P_neg` (proved) | `p^(3 (v m + 1)) ∣` the difference of the cubed summands at `(i p, l p)` and `(i, l)` | K, K⁻, A |
-| `SSplit.lean` | `S_split` (proved) | a double sum over `j ≤ k ≤ m p` reduces mod `q` to one over `l ≤ i ≤ m` | |
-| `ROneStep.lean` | `R_pos`, `R_neg`, `R_oneStep`, `R_dvd` (proved) | `p^(3 (v m + 1)) ∣ aInt(±m p) - aInt(±m)`, then `p^(3k) ∣ aInt(n p^(k-1)) - aInt(n p^k)` | S, V, P |
+| `UUnitSums.lean` | `U_sum_unit_sq`, `U.sum_range_coprime` | `∑ u ^ 2 = 0` over the units of `ZMod (p^s)` (`p ≥ 5`); a sum over `a < p^s c`, `p ∤ a`, of a function of `a` mod `p^s` is `c` times its sum over the units | |
+| `DShiftProd.lean` | `D_shift_prod` | `∏ (x + a) ≡ ∏ a [ZMOD p^(3 min(r, s))]` over `a < N`, `p ∤ a`, if `p^r ∣ x` and `p^s ∣ N` (`p ≥ 5`) | U |
+| `KJacobsthal.lean` | `K_choose` | `C((a+b) p, a p) ≡ C(a+b, a) [ZMOD p^(w + 3u + 3)]` if `p^u ∣ a`, `p^u ∣ b`, `p^w ∣ C(a+b, a)` (`p ≥ 5`) | D |
+| `KNegJacobsthal.lean` | `K_chooseNeg` | `C(b p + a p - 1, a p) ≡ C(b+a-1, a) [ZMOD p^(w + 3u + 3)]` if `p^u ∣ a`, `p^u ∣ b`, `p^w ∣ C(b+a-1, a)` (`p ≥ 5`) | K's helpers, D |
+| `AAbsorption.lean` | `A_absorb`, `A_absorbNeg`, `A_gcd`, `A_gcdNeg`, `A_symm_neg` | `N ∣ k C(N,k)`, `N ∣ k C(N+k-1,k)`, `x+y ∣ gcd(x,y) C(x+y,x)`, `N ∣ gcd(N,k) C(N+k-1,k)`, and `C(N+k-1,k) C(k,j) = C(N+j-1,j) C(N+k-1,k-j)` | |
+| `VVanish.lean` | `V_pos`, `V_neg` | `p^e ∣ N` gives `p^e ∣ C(N,k) C(k,j)` and `∣ C(N+k-1,k) C(k,j)` unless `p ∣ k ∧ p ∣ j` | A |
+| `PPerTerm.lean` | `P_summand`, `P_summandNeg` | the cubed summands at `((a+b) p, a p)` and `(a+b, a)` agree `[ZMOD p^(3e+3)]` if `p^e ∣ a+b+c` (resp. `p^e ∣ m`, `1 ≤ m`) | K, K⁻, A |
+| `SSplit.lean` | `S_split` | a double sum over `j ≤ k ≤ m p` reduces mod `q` to one over `l ≤ i ≤ m` | |
+| `ROneStep.lean` | `R_step`, `R_stepNeg`, `R_stepInt`, `R_pow` | `p^e ∣ n` gives `aInt(n p) ≡ aInt(n) [ZMOD p^(3e+3)]`; then `aInt(n p^(j+1)) ≡ aInt(n p^j) [ZMOD p^(3(j+1))]` | S, V, P |
 
-- "Proved" means the file itself has no `sorry`. Everything from K⁻ up to `Main.lean` is proved,
-  so `conjecture2` now waits only on U, D and K (about 630 lines of Epoch's 978).
-- U, D and K can go to three provers in parallel now. Each works against the statement of the lemma it uses
-  (D against U's, K against D's), which stays `sorry` until that lemma's prover finishes.
+- Every file is proved: there is no `sorry`, and `scripts/check.sh` passes with only the standard axioms.
 - `Defs.lean` holds `aInt`, a copy of upstream's `aInt`, and `Main.lean` proves them equal by `rfl`. Do not change it.
-- `Main.lean` already assembles `R_dvd` into the upstream theorem and builds. Do not put proof work there.
-- Edit only the file for your lemma. Helper lemmas go in that file (inside a `namespace A141057.<Letter>`,
-  so that helpers cannot clash when R imports every lemma file), or in a new `A141057/<Letter>/*.lean`
-  file imported only by it. Do not change a lemma's statement without sign-off: other files depend on it exactly as stated.
-- Epoch's accepted positive-case proof is a close map for U, D, K, A, V, P and R (see `../NOTES.md`, with line numbers).
-  Its repository has no license, so read it as a reference only and write our own code.
+- `Main.lean` only reindexes `k = j + 1` and applies `R_pow`. Do not put proof work there.
+- Helper lemmas go in their lemma's file, inside a `namespace A141057.<Letter>` so that helpers cannot clash when R
+  imports every lemma file, or in a new `A141057/<Letter>/*.lean` file imported only by it.
+  Do not change a lemma's statement without sign-off: other files depend on it exactly as stated.
 
 ## Imports: keep lemma files light
 
@@ -74,7 +69,7 @@ scripts/check.sh
 
 It runs `lake build`, then `#print axioms A141057.conjecture2` (from `scripts/Axioms.lean`). It fails on any axiom
 other than `propext`, `Classical.choice` and `Quot.sound`. `sorryAx` appears, and fails the check, until every lemma is done.
-To check one lemma quickly, put `import A141057.DShiftProd` and `#print axioms A141057.D_shiftProd` in a
+To check one lemma quickly, put `import A141057.DShiftProd` and `#print axioms A141057.D_shift_prod` in a
 scratch file and run `lake env lean <file>`.
 
 ## Setup in a new worktree: share the dependencies
